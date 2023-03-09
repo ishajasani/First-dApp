@@ -1,3 +1,3 @@
 # flutter_dapp
 
-A new Flutter project.
+A dApp that takes user given message and stores to the blockchain
