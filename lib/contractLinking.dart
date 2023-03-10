@@ -10,9 +10,9 @@ class ContractLinking extends ChangeNotifier {
   final String rpcUrl = "http://127.0.0.1:7545";
   final String wsUrl = "ws://127.0.0.1:7545";
   final String privateKey =
-      "89fdbb0078ad1c490af25c3bee0e9cc1129988e49b1f485c6e350db92cc3b163";
+      "0e0badf0b75bf2d08ba5c9c57d28e66b2055f5cd8f9e96751f8848172147fb90";
 
-  Web3Client? web3client;
+  Web3Client? _client;
   bool isLoading = true;
 
   String? abiCode;
@@ -31,40 +31,38 @@ class ContractLinking extends ChangeNotifier {
   }
 
   setup() async {
-    web3client = Web3Client(rpcUrl, Client(), socketConnector: () {
-      return IOWebSocketChannel.connect(wsUrl).cast<String>();
-    });
-
-    Future<void> getAbi() async {
-      String abiStringfile =
-          await rootBundle.loadString("build/contracts/HelloWorld.json");
-      final jsonAbi = jsonDecode(abiStringfile);
-      abiCode = jsonEncode(jsonAbi['abi']);
-      contractAddress =
-          EthereumAddress.fromHex(jsonAbi['networks']['5777']['address']);
-    }
-
-    Future<void> getCredentials() async {
-      credentials = EthPrivateKey.fromHex(privateKey);
-    }
-
-    Future<void> getDeployedContract() async {
-      contract = DeployedContract(
-          ContractAbi.fromJson(abiCode!, "HelloWorld"), contractAddress!);
-      _message = contract!.function('message');
-      _setMessage = contract!.function('setMessage');
-      getMessage();
-    }
-
+    _client = Web3Client(rpcUrl, Client());
     await getAbi();
     await getCredentials();
     await getDeployedContract();
   }
 
+  Future<void> getAbi() async {
+    String abiStringfile =
+        await rootBundle.loadString("src/abis/HelloWorld.json");
+    final jsonAbi = jsonDecode(abiStringfile);
+    abiCode = jsonEncode(jsonAbi['abi']);
+    contractAddress =
+        EthereumAddress.fromHex(jsonAbi['networks']['5777']['address']);
+    print(contractAddress);
+  }
+
+  Future<void> getCredentials() async {
+    credentials = EthPrivateKey.fromHex(privateKey);
+  }
+
+  Future<void> getDeployedContract() async {
+    contract = DeployedContract(
+        ContractAbi.fromJson(abiCode!, "HelloWorld"), contractAddress!);
+    _message = contract!.function('message');
+    _setMessage = contract!.function('setMessage');
+    getMessage();
+  }
+
   void setMessage(String message) async {
     isLoading = true;
     notifyListeners();
-    await web3client!.sendTransaction(
+    await _client!.sendTransaction(
         credentials!,
         Transaction.callContract(
             contract: contract!,
@@ -74,7 +72,8 @@ class ContractLinking extends ChangeNotifier {
   }
 
   getMessage() async {
-    final _mymessage = await web3client!
+    // ignore: no_leading_underscores_for_local_identifiers
+    List _mymessage = await _client!
         .call(contract: contract!, function: _message!, params: []);
     deployedName = _mymessage[0];
     isLoading = false;

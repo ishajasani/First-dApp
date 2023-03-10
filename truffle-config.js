@@ -69,7 +69,6 @@ module.exports = {
       port: 7545, // Standard Ethereum port (default: none)
       network_id: "5777", // Any network (default: none)
     },
-    contracts_build_directory: "./src/abis/",
     //
     // An additional network, but with some advanced options…
     advanced: {
@@ -98,11 +97,12 @@ module.exports = {
     //   production: true    // Treats this network as if it was a public net. (default: false)
     // }
   },
+  contracts_build_directory: "./src/abis/",
 
   // Set default mocha options here, use special reporters, etc.
-  mocha: {
+  //mocha: {
     // timeout: 100000
-  },
+ // },
 
   // Configure your compilers
   compilers: {
