@@ -11,6 +11,8 @@ class ContractLinking extends ChangeNotifier {
   final String wsUrl = "ws://127.0.0.1:7545";
   final String privateKey =
       "0e0badf0b75bf2d08ba5c9c57d28e66b2055f5cd8f9e96751f8848172147fb90";
+  
+  //hello
 
   Web3Client? _client;
   bool isLoading = true;
